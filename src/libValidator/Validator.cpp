@@ -283,8 +283,10 @@ bool Validator::CheckDirBlocks(
           dsblock.GetHeader().GetBlockNum(), serializedDSBlock);
       m_mediator.m_node->UpdateDSCommiteeComposition(mutable_ds_comm, dsblock);
       totalIndex++;
+#if 0  // clark
       BlockStorage::GetBlockStorage().PutDSCommittee(
-          m_mediator.m_DSCommittee, m_mediator.m_ds->GetConsensusLeaderID());
+              mutable_ds_comm, m_mediator.m_ds->GetConsensusLeaderID());
+#endif
       BlockStorage::GetBlockStorage().ResetDB(BlockStorage::STATE_DELTA);
     } else if (typeid(VCBlock) == dirBlock.type()) {
       const auto& vcblock = get<VCBlock>(dirBlock);

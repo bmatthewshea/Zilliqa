@@ -1609,6 +1609,25 @@ bool Lookup::ProcessSetDSInfoFromSeed(const bytes& message, unsigned int offset,
   }
   cv_dsInfoUpdate.notify_all();
 
+#if 1  // clark
+  pair<PubKey, Peer> dsLeader;
+  if (Node::GetDSLeader(m_mediator.m_blocklinkchain.GetLatestBlockLink(),
+                        m_mediator.m_dsBlockChain.GetLastBlock(),
+                        *m_mediator.m_DSCommittee, m_mediator.m_currentEpochNum,
+                        dsLeader)) {
+    auto iterDSLeader = std::find_if(
+        m_mediator.m_DSCommittee->begin(), m_mediator.m_DSCommittee->end(),
+        [dsLeader](const std::pair<PubKey, Peer>& pubKeyPeer) {
+          return pubKeyPeer.second == dsLeader.second;
+        });
+    if (iterDSLeader != m_mediator.m_DSCommittee->end()) {
+      BlockStorage::GetBlockStorage().PutDSCommittee(
+          m_mediator.m_DSCommittee,
+          iterDSLeader - m_mediator.m_DSCommittee->begin());
+    }
+  }
+#endif
+
   return true;
 }
 
@@ -3102,6 +3121,10 @@ bool Lookup::ProcessSetDirectoryBlocksFromSeed(
   }
 
   CheckBufferTxBlocks();
+
+#if 1  // clark
+  GetDSInfoFromSeedNodes();
+#endif
 
   return true;
 }
